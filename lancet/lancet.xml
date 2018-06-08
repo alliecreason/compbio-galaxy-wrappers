@@ -1,0 +1,65 @@
+<tool id="lancet" name="Lancet" version="@VERSION@.0" >
+
+  <description>Microassembly based somatic variant caller for NGS data</description>
+
+  <macros>
+      <import>macros.xml</import>
+  </macros>
+
+  <expand macro="requirements"/>
+
+  <command detect_errors="exit_code"><![CDATA[
+    ln -s $tumor tumor.bam &&
+    bamtools index -in tumor.bam &&
+    ln -s $normal normal.bam &&
+    bamtools index -in normal.bam &&
+    lancet  
+    --tumor tumor.bam
+    --normal normal.bam
+    #if $region_select.region_selector == "intervals":
+    --reg $reg
+    #else if $region_select.region_selector == "bed":
+    --bed  $bed
+    #end if
+    #if $reference_source.reference_source_selector != "history":
+    --ref ${reference_source.reference_sequence.fields.path}
+    #end if
+    --num-threads \${GALAXY_SLOTS:-4} 
+    > $output_vcf
+  ]]></command>
+
+  <inputs> 
+    <expand macro="ref_sel" />
+    <param name="tumor" type="data" format="bam" label="Tumor BAM" help="BAM file of mapped reads for tumor" />
+    <param name="normal" type="data" format="bam" label="Normal BAM" help="BAM file of mapped reads for normal" />
+    <conditional name="region_select">
+      <param name="region_selector" type="select" label="Choose the format of regions">
+        <option value="bed">BED</option>
+	<option value="intervals">Intervals</option>
+      </param>
+      <when value="bed">      
+        <param name="bed" type="data" format="bed" optional="true" label="Genomic Regions (BED)" help="genomic regions from file (BED format)"/>
+      </when>
+      <when value="intervals">
+	<param name="reg" type="data" format="gatk_interval" label="Genomic Regions (Intervals)" help="genomic region (in chr:start-end format)"/>
+      </when>
+    </conditional>
+  </inputs>
+
+
+  <outputs>
+    <data format="vcf" name="output_vcf" label="${tool.name} on ${on_string}: VCF" help="Output VCF with calls." />
+  </outputs>
+
+  <tests></tests>
+
+  <help><![CDATA[
+      Lancet is a somatic variant caller (SNVs and indels) for short read data. Lancet uses a localized micro-assembly strategy to detect somatic mutation with high sensitivity and accuracy on a tumor/normal pair. Lancet is based on the colored de Bruijn graph assembly paradigm where tumor and normal reads are jointly analyzed within the same graph. On-the-fly repeat composition analysis and self-tuning k-mer strategy are used together to increase specificity in regions characterized by low complexity sequences. Lancet requires the raw reads to be aligned with BWA (See BWA description for more info). Lancet is implemented in C++.
+  ]]></help>
+
+  <citations>
+      <citation type="doi">10.1038/s42003-018-0023-9</citation>
+  </citations>
+
+</tool>
+
