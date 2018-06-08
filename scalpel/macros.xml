@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 
 <macros>
+    
+    <xml name="requirements">
+        <requirements>
+            <requirement type="package" version="@VERSION@">scalpel</requirement>
+        </requirements>
+    </xml>
 
     <template name="disc_opts">
         #set index_path = $index.fields.path
@@ -65,4 +71,5 @@
         <param name="max_del_size" type="integer" min="0" value="1000000000" label="Max Deletion Size" help="maximum size of a deletion" />
     </xml>
 
+    <token name="@VERSION@">0.5.4</token>
 </macros>

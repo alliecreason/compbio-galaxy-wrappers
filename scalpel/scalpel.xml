@@ -1,7 +1,12 @@
-<tool id="scalpel_0_5_3" name="Scalpel v0.5.3" version="0.0.4" >
+<tool id="scalpel_@VERSION@" name="Scalpel v@VERSION@" version="@VERSION@.0" >
 
   <description>Indel variant analysis of short-read sequencing data with Scalpel</description>
-  <version_command></version_command>
+
+  <macros>
+      <import>macros.xml</import>
+  </macros>
+
+  <expand macro="requirements"/>
 
   <command detect_errors="exit_code"><![CDATA[
 
